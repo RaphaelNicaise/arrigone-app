@@ -268,7 +268,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Estado</span>
             <Select value={filters.estado || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, estado: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Estado" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Estado" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos los estados</SelectItem>
                 {STATUS_OPTIONS.map(s => (
@@ -286,7 +286,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Tipo de Propiedad</span>
             <Select value={filters.tipo || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, tipo: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Tipo" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos los tipos</SelectItem>
                 {PROPERTY_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -297,7 +297,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Forma de Operación</span>
             <Select value={filters.forma || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, forma: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Forma" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Forma" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todas las formas</SelectItem>
                 {PROPERTY_FORMS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
@@ -308,7 +308,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Apta Crédito</span>
             <Select value={filters.apta_credito || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, apta_credito: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Crédito" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Crédito" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todas</SelectItem>
                 {CREDIT_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -319,7 +319,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Dormitorios</span>
             <Select value={filters.dormitorios || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, dormitorios: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Dormitorios" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Dormitorios" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos</SelectItem>
                 {Array.from({ length: 11 }).map((_, i) => (
@@ -332,7 +332,7 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Llaves</span>
             <Select value={filters.llaves || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, llaves: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Llaves" /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Llaves" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todas</SelectItem>
                 {KEYS_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -343,7 +343,13 @@ export default function PropiedadesPage() {
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Vendedor</span>
             <Select value={filters.vendedor_id || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, vendedor_id: val || "Todos" }))}>
-              <SelectTrigger><SelectValue placeholder="Vendedor" /></SelectTrigger>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Vendedor">
+                  {filters.vendedor_id && filters.vendedor_id !== "Todos" 
+                    ? (vendedores.find(v => v.id.toString() === filters.vendedor_id)?.nombre || "Vendedor")
+                    : "Todos los vendedores"}
+                </SelectValue>
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos los vendedores</SelectItem>
                 {vendedores.map(v => (

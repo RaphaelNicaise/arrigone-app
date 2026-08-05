@@ -191,7 +191,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] h-[90vh] overflow-hidden flex flex-col bg-[#FBFBFA]">
+      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] overflow-hidden flex flex-col bg-[#FBFBFA]">
         <DialogHeader>
           <DialogTitle className="text-2xl">{isEdit ? "Editar Propiedad" : "Nueva Propiedad"}</DialogTitle>
           <DialogDescription>
@@ -201,7 +201,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
 
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col flex-1 overflow-hidden mt-4">
           <div className="flex-1 overflow-y-auto pr-2 pb-4 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             <div className="space-y-2">
               <Label>Dirección</Label>
@@ -251,7 +251,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
               </Select>
             </div>
 
-            <div className="space-y-2 md:col-span-2 bg-muted/30 p-4 rounded-xl border border-muted">
+            <div className="space-y-2 md:col-span-2 lg:col-span-3 bg-muted/30 p-4 rounded-xl border border-muted">
               <Label className="text-base font-semibold">Precio</Label>
               {isEdit && property?.precio_monto == null && property?.precio_moneda && property.precio_moneda !== "USD" && property.precio_moneda !== "ARS" && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm p-3 rounded-md mb-4">
@@ -373,7 +373,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
               </Popover>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 md:col-span-2 lg:col-span-3">
               <Label>Link (URL de publicación, Instagram, etc.)</Label>
               <Input 
                 type="url"
@@ -383,7 +383,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
               />
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 md:col-span-2 lg:col-span-3">
               <Label>Detalle / Información Adicional</Label>
               <Textarea 
                 value={formData.info_credito} 
