@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -63,15 +63,29 @@ export default function MultiSelectFilter({ title, placeholder, options, value, 
         <div className="flex flex-col">
           <div className="flex items-center justify-between gap-2 border-b px-3 py-2">
             <span className="text-xs font-medium text-muted-foreground">{title}</span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={toggleAll}
-              className="text-[#5CC05A] cursor-pointer"
-            >
-              {isAllSelected ? "Quitar todos" : "Seleccionar todos"}
-            </Button>
+            <div className="flex items-center gap-0.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={toggleAll}
+                className="text-[#5CC05A] cursor-pointer"
+              >
+                {isAllSelected ? "Quitar todos" : "Seleccionar todos"}
+              </Button>
+              {value.length > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => onChange([])}
+                  title="Borrar todos"
+                  className="text-muted-foreground cursor-pointer"
+                >
+                  <X />
+                </Button>
+              )}
+            </div>
           </div>
           <div className="max-h-[240px] overflow-y-auto p-1">
             {options.map(option => {
