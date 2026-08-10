@@ -45,10 +45,20 @@ export async function GET(request: NextRequest) {
       query = query.or(orQuery);
     }
     if (tipo) {
-      query = query.eq('tipo', tipo);
+      const tipos = tipo.split(',').map(v => v.trim()).filter(Boolean);
+      if (tipos.length === 1) {
+        query = query.eq('tipo', tipos[0]);
+      } else if (tipos.length > 1) {
+        query = query.in('tipo', tipos);
+      }
     }
     if (forma) {
-      query = query.eq('forma', forma);
+      const formas = forma.split(',').map(v => v.trim()).filter(Boolean);
+      if (formas.length === 1) {
+        query = query.eq('forma', formas[0]);
+      } else if (formas.length > 1) {
+        query = query.in('forma', formas);
+      }
     }
     if (estado) {
       query = query.eq('estado', estado);
@@ -60,7 +70,12 @@ export async function GET(request: NextRequest) {
       query = query.eq('apta_credito', apta_credito);
     }
     if (dormitorios) {
-      query = query.eq('dormitorios', dormitorios);
+      const dormitoriosList = dormitorios.split(',').map(v => v.trim()).filter(Boolean);
+      if (dormitoriosList.length === 1) {
+        query = query.eq('dormitorios', dormitoriosList[0]);
+      } else if (dormitoriosList.length > 1) {
+        query = query.in('dormitorios', dormitoriosList);
+      }
     }
     if (llaves) {
       query = query.eq('llaves', llaves);

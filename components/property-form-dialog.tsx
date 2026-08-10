@@ -14,6 +14,25 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ChevronsUpDown, Check, Plus, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+function maskDateInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
+function isValidDateInput(value: string): boolean {
+  if (!value) return true
+  const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (!match) return false
+  const day = parseInt(match[1], 10)
+  const month = parseInt(match[2], 10)
+  const year = parseInt(match[3], 10)
+  if (month < 1 || month > 12) return false
+  const daysInMonth = new Date(year, month, 0).getDate()
+  return day >= 1 && day <= daysInMonth
+}
+
 interface PropertyFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -142,6 +161,10 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (formData.fecha && !isValidDateInput(formData.fecha)) {
+      toast.error("La fecha debe tener el formato DD/MM/AAAA y ser una fecha válida")
+      return
+    }
     setLoading(true)
     try {
       const url = property ? `/api/propiedades/${property.id}` : "/api/propiedades"
@@ -191,7 +214,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] overflow-hidden flex flex-col bg-[#FBFBFA]">
+      <DialogContent className="max-w-[1060px] sm:max-w-[1060px] w-[95vw] h-[64vh] overflow-hidden flex flex-col bg-[#FBFBFA]">
         <DialogHeader>
           <DialogTitle className="text-2xl">{isEdit ? "Editar Propiedad" : "Nueva Propiedad"}</DialogTitle>
           <DialogDescription>
@@ -313,12 +336,14 @@ export default function PropertyFormDialog({ open, onOpenChange, property, vende
             </div>
 
             <div className="space-y-2">
-              <Label>Fecha (Texto libre)</Label>
+              <Label>Fecha (DD/MM/AAAA)</Label>
               <Input 
                 type="text"
+                inputMode="numeric"
                 value={formData.fecha} 
-                onChange={(e) => setFormData({...formData, fecha: e.target.value})}
-                placeholder="Ej. Marzo 2026, ?, 15/04/2026..."
+                onChange={(e) => setFormData({...formData, fecha: maskDateInput(e.target.value)})}
+                placeholder="Ej. 15/04/2026"
+                maxLength={10}
               />
             </div>
 

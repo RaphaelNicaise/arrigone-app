@@ -12,9 +12,10 @@ import { PROPERTY_TYPES, PROPERTY_FORMS, STATUS_OPTIONS, STATUS_COLORS, CREDIT_O
 import PropertyTable from "@/components/property-table"
 import PropertyFormDialog from "@/components/property-form-dialog"
 import ImportDialog from "@/components/import-dialog"
+import MultiSelectFilter from "@/components/multi-select-filter"
 import { Slider } from "@/components/ui/slider"
 
-function PriceFilterComponent({ filters, setFilters }: { filters: any, setFilters: any }) {
+function PriceFilterComponent({ filters, setFilters, properties }: { filters: any, setFilters: any, properties: Property[] }) {
   const [localPrice, setLocalPrice] = useState<{min: string, max: string}>({
     min: filters.precio_min || "",
     max: filters.precio_max || ""
@@ -26,8 +27,20 @@ function PriceFilterComponent({ filters, setFilters }: { filters: any, setFilter
     }
   }, [filters.precio_min, filters.precio_max])
 
-  const getSliderMax = () => filters.moneda === "USD" ? 500000 : 500000000
-  const getSliderStep = () => filters.moneda === "USD" ? 5000 : 5000000
+  const [maxArsSeen, setMaxArsSeen] = useState<number>(100000000)
+
+  useEffect(() => {
+    const arsPrices = properties
+      .filter(p => p.precio_moneda === "ARS" && p.precio_monto != null)
+      .map(p => p.precio_monto as number);
+    if (arsPrices.length > 0) {
+      const currentMax = Math.max(...arsPrices);
+      setMaxArsSeen(prev => Math.max(prev, Math.ceil(currentMax / 1000000) * 1000000));
+    }
+  }, [properties])
+
+  const getSliderMax = () => filters.moneda === "USD" ? 500000 : maxArsSeen
+  const getSliderStep = () => filters.moneda === "USD" ? 5000 : 1000000
 
   return (
     <div className="flex-1 w-full xl:w-auto flex flex-col justify-center max-w-2xl space-y-1">
@@ -107,24 +120,24 @@ export default function PropiedadesPage() {
   
   const [filters, setFilters] = useState<{
     search: string;
-    tipo: string;
-    forma: string;
+    tipo: string[];
+    forma: string[];
     estado: string;
     vendedor_id: string;
     apta_credito: string;
-    dormitorios: string;
+    dormitorios: string[];
     llaves: string;
     moneda: string;
     precio_min: string;
     precio_max: string;
   }>({
     search: "",
-    tipo: "Todos",
-    forma: "Todos",
+    tipo: [],
+    forma: [],
     estado: "Todos",
     vendedor_id: "Todos",
     apta_credito: "Todos",
-    dormitorios: "Todos",
+    dormitorios: [],
     llaves: "Todos",
     moneda: "USD",
     precio_min: "",
@@ -147,12 +160,12 @@ export default function PropiedadesPage() {
     try {
       const params = new URLSearchParams()
       if (debouncedSearch) params.append("search", debouncedSearch)
-      if (filters.tipo && filters.tipo !== "Todos") params.append("tipo", filters.tipo)
-      if (filters.forma && filters.forma !== "Todos") params.append("forma", filters.forma)
+      if (filters.tipo && filters.tipo.length > 0) params.append("tipo", filters.tipo.join(","))
+      if (filters.forma && filters.forma.length > 0) params.append("forma", filters.forma.join(","))
       if (filters.estado && filters.estado !== "Todos") params.append("estado", filters.estado)
       if (filters.vendedor_id && filters.vendedor_id !== "Todos") params.append("vendedor_id", filters.vendedor_id)
       if (filters.apta_credito && filters.apta_credito !== "Todos") params.append("apta_credito", filters.apta_credito)
-      if (filters.dormitorios && filters.dormitorios !== "Todos") params.append("dormitorios", filters.dormitorios)
+      if (filters.dormitorios && filters.dormitorios.length > 0) params.append("dormitorios", filters.dormitorios.join(","))
       if (filters.llaves && filters.llaves !== "Todos") params.append("llaves", filters.llaves)
       if (filters.moneda && filters.moneda !== "Todas" && (filters.precio_min || filters.precio_max)) {
         params.append("moneda", filters.moneda)
@@ -197,12 +210,12 @@ export default function PropiedadesPage() {
   const handleExport = () => {
     const params = new URLSearchParams()
     if (debouncedSearch) params.append("search", debouncedSearch)
-    if (filters.tipo && filters.tipo !== "Todos") params.append("tipo", filters.tipo)
-    if (filters.forma && filters.forma !== "Todos") params.append("forma", filters.forma)
+    if (filters.tipo && filters.tipo.length > 0) params.append("tipo", filters.tipo.join(","))
+    if (filters.forma && filters.forma.length > 0) params.append("forma", filters.forma.join(","))
     if (filters.estado && filters.estado !== "Todos") params.append("estado", filters.estado)
     if (filters.vendedor_id && filters.vendedor_id !== "Todos") params.append("vendedor_id", filters.vendedor_id)
     if (filters.apta_credito && filters.apta_credito !== "Todos") params.append("apta_credito", filters.apta_credito)
-    if (filters.dormitorios && filters.dormitorios !== "Todos") params.append("dormitorios", filters.dormitorios)
+    if (filters.dormitorios && filters.dormitorios.length > 0) params.append("dormitorios", filters.dormitorios.join(","))
     if (filters.llaves && filters.llaves !== "Todos") params.append("llaves", filters.llaves)
     if (filters.moneda && filters.moneda !== "Todas" && (filters.precio_min || filters.precio_max)) {
       params.append("moneda", filters.moneda)
@@ -227,17 +240,17 @@ export default function PropiedadesPage() {
     }
   }
 
-  const isFiltered = !!(debouncedSearch || (filters.tipo && filters.tipo !== "Todos") || (filters.forma && filters.forma !== "Todos") || (filters.estado && filters.estado !== "Todos") || (filters.vendedor_id && filters.vendedor_id !== "Todos") || (filters.apta_credito && filters.apta_credito !== "Todos") || (filters.dormitorios && filters.dormitorios !== "Todos") || (filters.llaves && filters.llaves !== "Todos") || filters.precio_min || filters.precio_max)
+  const isFiltered = !!(debouncedSearch || (filters.tipo && filters.tipo.length > 0) || (filters.forma && filters.forma.length > 0) || (filters.estado && filters.estado !== "Todos") || (filters.vendedor_id && filters.vendedor_id !== "Todos") || (filters.apta_credito && filters.apta_credito !== "Todos") || (filters.dormitorios && filters.dormitorios.length > 0) || (filters.llaves && filters.llaves !== "Todos") || filters.precio_min || filters.precio_max)
 
   const resetFilters = () => {
     setFilters({
       search: "",
-      tipo: "Todos",
-      forma: "Todos",
+      tipo: [],
+      forma: [],
       estado: "Todos",
       vendedor_id: "Todos",
       apta_credito: "Todos",
-      dormitorios: "Todos",
+      dormitorios: [],
       llaves: "Todos",
       moneda: "USD",
       precio_min: "",
@@ -285,24 +298,24 @@ export default function PropiedadesPage() {
           
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Tipo de Propiedad</span>
-            <Select value={filters.tipo || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, tipo: val || "Todos" }))}>
-              <SelectTrigger className="w-full"><SelectValue placeholder="Tipo" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todos los tipos</SelectItem>
-                {PROPERTY_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <MultiSelectFilter
+              title="Tipo de Propiedad"
+              placeholder="Todos los tipos"
+              options={PROPERTY_TYPES.map(t => ({ value: t, label: t }))}
+              value={filters.tipo}
+              onChange={(vals) => setFilters(f => ({ ...f, tipo: vals }))}
+            />
           </div>
 
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Forma de Operación</span>
-            <Select value={filters.forma || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, forma: val || "Todos" }))}>
-              <SelectTrigger className="w-full"><SelectValue placeholder="Forma" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todas las formas</SelectItem>
-                {PROPERTY_FORMS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <MultiSelectFilter
+              title="Forma de Operación"
+              placeholder="Todas las formas"
+              options={PROPERTY_FORMS.map(f => ({ value: f, label: f }))}
+              value={filters.forma}
+              onChange={(vals) => setFilters(f => ({ ...f, forma: vals }))}
+            />
           </div>
 
           <div className="space-y-1">
@@ -318,15 +331,13 @@ export default function PropiedadesPage() {
 
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground ml-1">Dormitorios</span>
-            <Select value={filters.dormitorios || "Todos"} onValueChange={(val) => setFilters(f => ({ ...f, dormitorios: val || "Todos" }))}>
-              <SelectTrigger className="w-full"><SelectValue placeholder="Dormitorios" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todos</SelectItem>
-                {Array.from({ length: 11 }).map((_, i) => (
-                  <SelectItem key={i} value={i.toString()}>{i === 0 ? "Monoambiente" : i}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiSelectFilter
+              title="Dormitorios"
+              placeholder="Todos"
+              options={Array.from({ length: 11 }).map((_, i) => ({ value: i.toString(), label: i === 0 ? "Monoambiente" : i.toString() }))}
+              value={filters.dormitorios}
+              onChange={(vals) => setFilters(f => ({ ...f, dormitorios: vals }))}
+            />
           </div>
 
           <div className="space-y-1">
@@ -398,7 +409,7 @@ export default function PropiedadesPage() {
           </div>
 
           {/* Middle: Price Filter */}
-          <PriceFilterComponent filters={filters} setFilters={setFilters} />
+          <PriceFilterComponent filters={filters} setFilters={setFilters} properties={properties} />
 
           {/* Right: Actions */}
           <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-center xl:justify-end">

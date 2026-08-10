@@ -44,9 +44,9 @@ export const STATUS_COLORS: Record<PropertyStatus, { bg: string; text: string; b
     border: 'rgba(255, 235, 59, 0.40)',
   },
   incompleto: {
-    bg: 'rgba(216, 27, 96, 0.15)',
-    text: '#880e4f',
-    border: 'rgba(216, 27, 96, 0.45)',
+    bg: 'rgba(147, 51, 234, 0.15)',
+    text: '#6b21a8',
+    border: 'rgba(147, 51, 234, 0.50)',
   },
   no_disponible: {
     bg: 'rgba(239, 83, 80, 0.10)',

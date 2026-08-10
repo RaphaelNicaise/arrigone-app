@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Property, PropertyStatus } from "@/lib/types"
 import { STATUS_COLORS, STATUS_OPTIONS } from "@/lib/constants"
+import { formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
@@ -194,7 +195,7 @@ export default function PropertyTable({ properties, loading, onEdit, onDelete }:
                   <TableCell>{prop.tipo || '-'}</TableCell>
                   <TableCell>{prop.forma || '-'}</TableCell>
                   <TableCell>{prop.apta_credito || '-'}</TableCell>
-                  <TableCell className="max-w-[120px] truncate" title={prop.fecha || ''}>{prop.fecha || '-'}</TableCell>
+                  <TableCell className="max-w-[120px] truncate" title={prop.fecha || ''}>{formatDate(prop.fecha) || '-'}</TableCell>
                   <TableCell className="max-w-[150px] font-semibold truncate" title={formatPrice(prop)}>{formatPrice(prop)}</TableCell>
                   <TableCell>{prop.dormitorios || '-'}</TableCell>
                   <TableCell>{prop.llaves || '-'}</TableCell>
@@ -298,7 +299,7 @@ export default function PropertyTable({ properties, loading, onEdit, onDelete }:
                 </div>
                 <div>
                   <span className="text-muted-foreground block text-xs">Fecha</span>
-                  <span className="block truncate" title={prop.fecha || ''}>{prop.fecha || '-'}</span>
+                  <span className="block truncate" title={prop.fecha || ''}>{formatDate(prop.fecha) || '-'}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground block text-xs">Llaves</span>

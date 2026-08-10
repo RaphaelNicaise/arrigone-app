@@ -1,5 +1,6 @@
 import { Property, PropertyStatus } from './types';
 import { STATUS_OPTIONS } from './constants';
+import { formatDate } from './utils';
 
 // Column mapping from Excel headers to DB fields
 const COLUMN_MAP: Record<string, string> = {
@@ -124,7 +125,7 @@ export function propertyToExcelRow(property: Property): Record<string, string | 
     'Tipo': property.tipo,
     'Forma': property.forma,
     'Apta Crédito': property.apta_credito,
-    'Fecha': property.fecha,
+    'Fecha': formatDate(property.fecha),
     'Precio': precio,
     'Dormitorios': property.dormitorios,
     'Llaves': property.llaves,
