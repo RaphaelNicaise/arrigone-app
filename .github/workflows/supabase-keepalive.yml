@@ -1,0 +1,44 @@
+name: Supabase Keepalive (Anti-Pause)
+
+on:
+  schedule:
+    # Se ejecuta cada 2 días a las 04:00 UTC para asegurar que nunca se alcancen los 7 días de inactividad
+    - cron: '0 4 */2 * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub cuando se desee
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping y actualización directa en Supabase
+        run: |
+          echo "Ejecutando keepalive en Supabase..."
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Actualización real (PATCH) del campo updated_at de la propiedad fija
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            "https://wsqfbulvzcctegalyine.supabase.co/rest/v1/propiedades?id=eq.071b2a16-81df-4e9c-b29b-88ac5487bb7b" \
+            -H "apikey: sb_publishable_M7rvxpIOPruX5j-M50AiNg_89ePJTV5" \
+            -H "Authorization: Bearer sb_publishable_M7rvxpIOPruX5j-M50AiNg_89ePJTV5" \
+            -H "Content-Type: application/json" \
+            -d "{\"updated_at\": \"$TIMESTAMP\"}")
+
+          echo "Status de escritura PATCH: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne 200 ] && [ "$HTTP_STATUS" -ne 204 ]; then
+            echo "Error en la escritura de keepalive (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+
+          # Consulta de lectura para asegurar tráfico completo
+          READ_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+            "https://wsqfbulvzcctegalyine.supabase.co/rest/v1/propiedades?select=id&limit=1" \
+            -H "apikey: sb_publishable_M7rvxpIOPruX5j-M50AiNg_89ePJTV5" \
+            -H "Authorization: Bearer sb_publishable_M7rvxpIOPruX5j-M50AiNg_89ePJTV5")
+          
+          echo "Status de lectura GET: $READ_STATUS"
+          if [ "$READ_STATUS" -ne 200 ]; then
+            echo "Error en la lectura de keepalive (HTTP $READ_STATUS)"
+            exit 1
+          fi
+
+          echo "Keepalive completado con éxito a las $TIMESTAMP"
